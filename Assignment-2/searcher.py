@@ -109,7 +109,7 @@ class Index(object):
         """
         tempdict = {}
         for k, v in index.items():
-            tempdict[k] = sorted(v, key=sum,reverse=True)[:threshold]
+            tempdict[k] = sorted(v, key=lambda x:x[1],reverse=True)[:threshold]
         return tempdict 
         pass
     
@@ -158,19 +158,25 @@ class Index(object):
         #        pos[element].append([docID, res[element]])
         #return pos
         
-        pos = defaultdict(lambda:[])
+        final = defaultdict(self.def_dict)
         total_docs = float(len(docs)) 
-        new_idf = self.find_idf(total_docs,doc_freqs)
-        res = {}
+        new_tf = defaultdict(self.def_dict)
+        for key in doc_freqs.keys():
+            new_tf[key] = math.log((total_docs/doc_freqs[key]),10)
         for i in range(0,len(docs)):
-            new_tf = dict(Counter(docs[i]))
-            new_tf = self.find_tf(docs[i])
-            for key in new_tf.keys():
-                res[key]= new_idf[key]*new_tf[key]
-        for docID, lists in enumerate(docs):
-            for element in set(lists):
-                pos[element].append([docID,res[element]])
-        return pos
+            new_idf = dict(Counter(docs[i]))
+            for key in new_idf.keys():
+                new_idf[key] = 1 + math.log(new_idf[key],10)
+            for key in new_idf.keys():
+                result = [i,new_tf[key]*new_idf[key]]
+                if self.word_check(final, key):
+                    res = final[key]
+                    res.append(result)
+                    final[key] = res
+                else:
+                    final[key] = [result]
+        return final
+
         pass
 
     
