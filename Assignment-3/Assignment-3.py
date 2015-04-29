@@ -3,6 +3,7 @@ import re
 import math
 from collections import defaultdict
 import nltk.metrics
+from copy import deepcopy
 import sys
 import operator
 from matplotlib import pyplot as plt
@@ -71,7 +72,7 @@ def compute_doc_length(docs):
     return {term: len(word) for term, word in enumerate(docs)}
     
 def create_tfidf_index(docs, term_occ):
-    new = term_occ
+    new = deepcopy(term_occ)
     for key in new.keys():
         res = new[key]
         idf = find_idf(float(docs),len(res)) 
